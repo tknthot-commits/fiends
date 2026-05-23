@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from 'express'
-import { conversations, messages, matches } from '../data/mock.js'
+import { conversations, messages, matches, scheduleAutoReply } from '../data/mock.js'
 import type { Message } from '../../shared/types.js'
 
 const router = Router()
@@ -62,6 +62,16 @@ router.post('/conversations/:id/messages', (req: Request, res: Response): void =
   conversation.lastMessage = newMessage
   conversation.unreadCount += 1
   conversation.updatedAt = newMessage.sentAt
+
+  const match = matches.find(m => m.id === conversation.matchId)
+  const receiverId = match ? (match.userId === senderId ? match.user.id : match.userId) : senderId
+
+  scheduleAutoReply(conversation.matchId, senderId, receiverId, content, (reply) => {
+    messages.push(reply)
+    conversation.lastMessage = reply
+    conversation.unreadCount += 1
+    conversation.updatedAt = reply.sentAt
+  })
 
   res.status(201).json({ success: true, data: newMessage })
 })

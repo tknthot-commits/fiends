@@ -630,3 +630,87 @@ export function getUserById(id: string): StoredUser | undefined {
 export function getUserCardById(id: string): UserCard | undefined {
   return userCards.find(u => u.id === id)
 }
+
+const AUTO_REPLIES: Record<string, string[]> = {
+  default: [
+    '哈哈，真的吗？😄',
+    '好呀好呀～',
+    '你平时喜欢做什么呀？',
+    '嗯嗯，我在听~',
+    '说的有道理！',
+    '哈哈，你好有趣',
+    '周末有什么安排吗？',
+    '我也喜欢这个！',
+    '真的假的？太巧了吧',
+    '有眼光 👏',
+  ],
+  hello: [
+    '你好呀！很高兴认识你 😊',
+    '嗨～终于等到你啦！',
+    'Hi！今天过得怎么样？',
+    'Hello～ 你也在呀',
+  ],
+  food: [
+    '吃货握爪！🍽️',
+    '说到吃的我就来劲了！',
+    '求推荐好吃的店！',
+    '改天一起去吃呀～',
+  ],
+  travel: [
+    '旅行是我最大的爱好！',
+    '好想去旅行啊～',
+    '你最喜欢哪个城市？',
+    '下次旅行带上我！',
+  ],
+  music: [
+    '你也喜欢音乐？太棒了！',
+    '最近在听什么歌？',
+    '推荐一首你最喜欢的歌吧 🎵',
+    '有机会一起听歌！',
+  ],
+}
+
+function detectTopic(content: string): string {
+  const lower = content.toLowerCase()
+  if (/你好|hi|hello|嗨|哈喽/.test(lower)) return 'hello'
+  if (/吃|美食|餐厅|探店|好吃/.test(lower)) return 'food'
+  if (/旅行|旅游|去|玩|风景/.test(lower)) return 'travel'
+  if (/音乐|歌|听|唱/.test(lower)) return 'music'
+  return 'default'
+}
+
+let replyTimers: ReturnType<typeof setTimeout>[] = []
+
+export function clearReplyTimers() {
+  replyTimers.forEach(t => clearTimeout(t))
+  replyTimers = []
+}
+
+export function scheduleAutoReply(
+  matchId: string,
+  senderId: string,
+  receiverId: string,
+  content: string,
+  onReply: (message: Message) => void,
+) {
+  const delay = 2000 + Math.random() * 4000
+  const timer = setTimeout(() => {
+    const topic = detectTopic(content)
+    const replies = AUTO_REPLIES[topic] || AUTO_REPLIES.default
+    const reply = replies[Math.floor(Math.random() * replies.length)]
+
+    const replyMessage: Message = {
+      id: `msg_auto_${Date.now()}`,
+      matchId,
+      senderId: receiverId,
+      content: reply,
+      messageType: 'text',
+      sentAt: new Date().toISOString(),
+      isRead: false,
+    }
+
+    onReply(replyMessage)
+  }, delay)
+
+  replyTimers.push(timer)
+}

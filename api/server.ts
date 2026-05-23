@@ -1,7 +1,7 @@
 import app from './app.js'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
-import { messages, conversations, getUserById } from './data/mock.js'
+import { messages, conversations, getUserById, scheduleAutoReply } from './data/mock.js'
 import type { Message } from '../shared/types.js'
 
 const PORT = process.env.PORT || 3001
@@ -57,6 +57,12 @@ io.on('connection', (socket) => {
 
     io.to(`user:${data.senderId}`).emit('message:new', newMessage)
     io.to(`user:${data.receiverId}`).emit('message:new', newMessage)
+
+    scheduleAutoReply(data.matchId, data.senderId, data.receiverId, data.content, (reply) => {
+      messages.push(reply)
+      io.to(`user:${data.senderId}`).emit('message:new', reply)
+      io.to(`user:${data.receiverId}`).emit('message:new', reply)
+    })
   })
 
   socket.on('message:read', (data: {
