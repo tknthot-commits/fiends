@@ -99,7 +99,7 @@ export default function Discover() {
       <div className="flex-1 px-4 pb-4">
         {currentIndex < users.length ? (
           <div className="relative mx-auto h-full max-w-md">
-            {users.slice(currentIndex, currentIndex + 3).map((user, index) => (
+            {users.slice(currentIndex, currentIndex + 2).map((user, index) => (
               <UserCard
                 key={user.id}
                 user={user}

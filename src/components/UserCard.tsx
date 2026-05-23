@@ -30,8 +30,8 @@ export default function UserCard({ user, onSwipe, isTop = true }: UserCardProps)
   return (
     <motion.div
       className={cn(
-        'absolute inset-0 rounded-[24px] overflow-hidden cursor-grab active:cursor-grabbing card-shadow',
-        !isTop && 'scale-[0.95] opacity-80'
+        'absolute inset-0 rounded-[24px] overflow-hidden cursor-grab active:cursor-grabbing card-shadow bg-white',
+        !isTop && 'scale-[0.95]'
       )}
       style={{ x, rotate }}
       drag={isTop ? 'x' : false}
@@ -39,7 +39,7 @@ export default function UserCard({ user, onSwipe, isTop = true }: UserCardProps)
       dragElastic={0.9}
       onDragEnd={handleDragEnd}
       initial={isTop ? { scale: 0.9, opacity: 0 } : false}
-      animate={isTop ? { scale: 1, opacity: 1 } : { scale: 0.95, opacity: 0.8 }}
+      animate={isTop ? { scale: 1, opacity: 1 } : { scale: 0.95 }}
       transition={{ duration: 0.3 }}
     >
       <div className="relative h-full w-full">

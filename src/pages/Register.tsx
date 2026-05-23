@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Phone, Lock, User, MessageSquare, ArrowRight, Heart } from 'lucide-react'
+import { Phone, Lock, User, KeyRound, ArrowRight, Heart } from 'lucide-react'
 import { api } from '@/apiClient'
 import { useAuthStore } from '@/stores/authStore'
 import type { AuthResponse, RegisterRequest } from '../../shared/types'
@@ -137,7 +137,7 @@ export default function Register() {
           </div>
 
           <div className="relative">
-            <MessageSquare className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-secondary" />
+            <KeyRound className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-secondary" />
             <input
               type="text"
               value={code}
