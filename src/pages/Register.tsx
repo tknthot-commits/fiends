@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Phone, Lock, User, KeyRound, ArrowRight, Heart } from 'lucide-react'
+import { Phone, Lock, User, KeyRound, ArrowRight, Heart, Venus, Mars } from 'lucide-react'
 import { api } from '@/apiClient'
 import { useAuthStore } from '@/stores/authStore'
 import type { AuthResponse, RegisterRequest } from '../../shared/types'
@@ -18,6 +18,7 @@ export default function Register() {
   const [codeLoading, setCodeLoading] = useState(false)
   const [codeSent, setCodeSent] = useState(false)
   const [countdown, setCountdown] = useState(0)
+  const [gender, setGender] = useState<0 | 1 | 2>(1)
 
   const sendCode = async () => {
     if (!phone || phone.length < 11) {
@@ -64,6 +65,7 @@ export default function Register() {
         password,
         code,
         nickname,
+        gender,
       } as RegisterRequest)
       setAuth(data.user, data.token)
       navigate('/discover', { replace: true })
@@ -166,6 +168,36 @@ export default function Register() {
               className="input-field pl-12"
               minLength={6}
             />
+          </div>
+
+          <div className="rounded-[16px] bg-white/60 p-4 card-shadow">
+            <p className="mb-3 text-sm font-medium text-text-secondary">我是</p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setGender(2)}
+                className={`flex flex-1 items-center justify-center gap-2 rounded-[14px] py-3 text-sm font-medium transition-all ${
+                  gender === 2
+                    ? 'bg-dark text-white shadow-md'
+                    : 'bg-white text-text-secondary hover:bg-dark/5'
+                }`}
+              >
+                <Mars className="h-5 w-5" />
+                男生
+              </button>
+              <button
+                type="button"
+                onClick={() => setGender(1)}
+                className={`flex flex-1 items-center justify-center gap-2 rounded-[14px] py-3 text-sm font-medium transition-all ${
+                  gender === 1
+                    ? 'bg-brand text-white shadow-md'
+                    : 'bg-white text-text-secondary hover:bg-brand/5'
+                }`}
+              >
+                <Venus className="h-5 w-5" />
+                女生
+              </button>
+            </div>
           </div>
 
           <motion.button

@@ -6,6 +6,16 @@ const router = Router()
 
 router.get('/recommendations', (req: Request, res: Response): void => {
   const userId = (req.query.userId as string) || 'user_1'
+  const page = parseInt(req.query.page as string) || 1
+  const limit = parseInt(req.query.limit as string) || 10
+
+  const currentUser = getUserById(userId)
+  if (!currentUser) {
+    res.status(404).json({ success: false, error: '用户不存在' })
+    return
+  }
+
+  const preferredGender = currentUser.gender === 2 ? 1 : 2
 
   const swipedUserIds = new Set(
     swipeRecords
@@ -21,9 +31,11 @@ router.get('/recommendations', (req: Request, res: Response): void => {
 
   const excludedIds = new Set([...swipedUserIds, ...matchedUserIds, userId])
 
-  const recommendations = userCards.filter(u => !excludedIds.has(u.id))
+  const recommendations = userCards
+    .filter(u => !excludedIds.has(u.id) && u.gender === preferredGender)
+    .slice((page - 1) * limit, page * limit)
 
-  res.json({ success: true, data: recommendations })
+  res.json({ success: true, data: { users: recommendations, total: recommendations.length } })
 })
 
 router.post('/swipe', (req: Request, res: Response): void => {

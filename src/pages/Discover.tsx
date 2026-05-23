@@ -1,8 +1,9 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Star, Heart, SlidersHorizontal } from 'lucide-react'
 import UserCard from '@/components/UserCard'
 import MatchPopup from '@/components/MatchPopup'
+import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/lib/utils'
 import type { UserCard as UserCardType, SwipeAction } from '../../shared/types'
 
@@ -27,7 +28,15 @@ const MOCK_USERS: UserCardType[] = [
 const FILTER_OPTIONS = ['全部', '上海', '北京', '深圳', '杭州', '广州']
 
 export default function Discover() {
-  const [users, setUsers] = useState(MOCK_USERS)
+  const currentUser = useAuthStore((s) => s.user)
+  const preferredGender = currentUser?.gender === 2 ? 1 : 2
+
+  const filteredUsers = useMemo(
+    () => MOCK_USERS.filter((u) => u.gender === preferredGender),
+    [preferredGender],
+  )
+
+  const [users, setUsers] = useState(filteredUsers)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [showMatch, setShowMatch] = useState(false)
   const [matchedUser, setMatchedUser] = useState<UserCardType | null>(null)
@@ -35,11 +44,11 @@ export default function Discover() {
   const [showFilters, setShowFilters] = useState(false)
   const [superLikeCount, setSuperLikeCount] = useState(3)
 
-  const currentUser = users[currentIndex]
+  const displayUser = users[currentIndex]
 
   const handleSwipe = useCallback(
     (action: SwipeAction) => {
-      if (!currentUser) return
+      if (!displayUser) return
 
       if (action === 'super_like' && superLikeCount > 0) {
         setSuperLikeCount((c) => c - 1)
@@ -47,13 +56,13 @@ export default function Discover() {
 
       const isMatch = action === 'like' || action === 'super_like'
       if (isMatch && Math.random() > 0.7) {
-        setMatchedUser(currentUser)
+        setMatchedUser(displayUser)
         setShowMatch(true)
       }
 
       setCurrentIndex((i) => i + 1)
     },
-    [currentUser, superLikeCount]
+    [displayUser, superLikeCount]
   )
 
   const handleDragEnd = (direction: string) => {
@@ -64,7 +73,7 @@ export default function Discover() {
 
   const resetCards = () => {
     setCurrentIndex(0)
-    setUsers(MOCK_USERS)
+    setUsers(filteredUsers)
   }
 
   return (

@@ -114,6 +114,7 @@ export interface RegisterRequest {
   password: string
   code: string
   nickname: string
+  gender: 0 | 1 | 2
 }
 
 export interface VoiceTokenResponse {

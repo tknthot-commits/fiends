@@ -5,7 +5,7 @@ import type { LoginRequest, RegisterRequest } from '../../shared/types.js'
 const router = Router()
 
 router.post('/register', (req: Request, res: Response): void => {
-  const { phone, password, nickname } = req.body as RegisterRequest
+  const { phone, password, nickname, gender } = req.body as RegisterRequest
 
   if (!phone || !password || !nickname) {
     res.status(400).json({ success: false, error: '手机号、密码和昵称为必填项' })
@@ -23,11 +23,11 @@ router.post('/register', (req: Request, res: Response): void => {
     phone,
     password,
     nickname,
+    gender: gender ?? 2 as 0 | 1 | 2,
     avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${nickname}`,
     photos: [],
     bio: '',
     age: 0,
-    gender: 2 as 0 | 1 | 2,
     city: '',
     occupation: '',
     tags: [],
